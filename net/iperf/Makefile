@@ -23,7 +23,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/iperf/Default
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:= +uclibcxx
+  DEPENDS:= +USE_UCLIBC:uclibcxx +!USE_UCLIBC:libstdcpp
   TITLE:=Internet Protocol bandwidth measuring tool
   URL:=http://sourceforge.net/projects/iperf/
 endef
@@ -67,7 +67,9 @@ else
   CONFIGURE_VARS += ac_cv_func_pthread_cancel=no
 endif
 
+ifdef CONFIG_USE_UCLIBC
 TARGET_CXX=g++-uc
+endif
 
 CONFIGURE_VARS += CXXFLAGS="$$$$CXXFLAGS -fno-rtti"
 
