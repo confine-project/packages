@@ -1,0 +1,34 @@
+--- a/include/gnu_getopt.h
++++ b/include/gnu_getopt.h
+@@ -30,8 +30,8 @@
+  * $Id: gnu_getopt.h,v 1.1.1.1 2004/05/18 01:50:44 kgibbs Exp $
+  */
+ 
+-#ifndef _GETOPT_H
+-    #define _GETOPT_H 1
++#ifndef _GNU_GETOPT_H
++    #define _GNU_GETOPT_H 1
+ 
+     #ifdef	__cplusplus
+ extern "C" {
+@@ -92,12 +92,14 @@ extern int gnu_optopt;
+ /* has_arg can't be an enum because some compilers complain about
+    type mismatches in all the code that assumes it is an int.  */
+ 
++#ifndef _GETOPT_H
+ struct option {
+     const char *name;
+     int has_arg;
+     int *flag;
+     int val;
+ };
++#endif
+ 
+ /* Names for the values of the `has_arg' field of `struct option'.  */
+ 
+@@ -133,4 +135,4 @@ int _gnu_getopt_internal( int argc,
+ } /* end extern "C" */
+     #endif
+ 
+-#endif /* _GETOPT_H */
++#endif /* _GNU_GETOPT_H */
