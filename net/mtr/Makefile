@@ -43,8 +43,10 @@ endef
 CONFIGURE_ARGS += \
 	--without-gtk \
 
-#CONFIGURE_VARS += \
-#	ac_cv_lib_resolv_res_mkquery=no \
+CONFIGURE_VARS += \
+	ac_cv_lib_resolv_res_mkquery=no
+
+CONFIGURE_VARS += LIBS="-lresolv"
 
 define Build/Configure
 	(cd $(PKG_BUILD_DIR); touch \
