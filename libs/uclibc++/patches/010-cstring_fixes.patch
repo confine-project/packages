@@ -1,0 +1,20 @@
+--- a/include/cstring
++++ b/include/cstring
+@@ -48,7 +48,7 @@ namespace std{
+ 	using ::strtok;
+ 	using ::strxfrm;
+ 
+-
++#ifdef __UCLIBC__
+ 	//Extra definitions required in c++ spec
+ 
+ 
+@@ -72,6 +72,8 @@ namespace std{
+ 		return strstr(const_cast<const char *>(s1), s2);
+ 	}
+ 
++#endif /* __UCLIBC__ */
++
+ }
+ 
+ #endif
