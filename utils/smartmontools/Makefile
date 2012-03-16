@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=smartmontools
 PKG_VERSION:=5.40
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@SF/smartmontools
@@ -56,7 +56,7 @@ CONFIGURE_VARS += \
 	CXXFLAGS="$$$$CXXFLAGS -fno-builtin -fno-rtti -nostdinc++" \
 	CPPFLAGS="$$$$CPPFLAGS -I$(STAGING_DIR)/usr/include/uClibc++ -I$(LINUX_DIR)/include" \
 	LDFLAGS="$$$$LDFLAGS" \
-	LIBS="-nodefaultlibs -luClibc++ -lm $(LIBGCC_S) -lc" \
+	LIBS="-nodefaultlibs -lc -luClibc++ -lm $(LIBGCC_S) -lc" \
 
 define Build/Configure
 	(cd $(PKG_BUILD_DIR); rm -rf config.{cache,status} ; \
@@ -82,6 +82,10 @@ define Package/smartd/install
 	$(INSTALL_DATA) ./files/smartd.conf $(1)/etc/
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/smartd.init $(1)/etc/init.d/smartd
+endef
+
+define Package/smartd/conffiles
+/etc/smartd.conf
 endef
 
 $(eval $(call BuildPackage,smartmontools))

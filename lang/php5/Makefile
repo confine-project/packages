@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2011 OpenWrt.org
+# Copyright (C) 2006-2012 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=php
-PKG_VERSION:=5.3.8
-PKG_RELEASE:=5
+PKG_VERSION:=5.3.10
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://www.php.net/distributions/
-PKG_MD5SUM:=704cd414a0565d905e1074ffdc1fadfb
+PKG_MD5SUM:=816259e5ca7d0a7e943e56a3bb32b17f
 
 PKG_FIXUP:=libtool no-autoreconf
 PKG_BUILD_PARALLEL:=1
@@ -30,12 +30,12 @@ PHP5_MODULES = \
 	iconv \
 	json \
 	ldap libevent \
-	mbstring mcrypt mysql \
+	mbstring mcrypt mysql mysqli \
 	openssl \
 	pcntl pdo pdo-mysql pdo-pgsql pdo-sqlite pgsql \
 	session simplexml soap sockets sqlite sqlite3 sysvmsg sysvsem sysvshm \
 	tokenizer \
-	xml xmlreader xmlwriter \
+	xml xmlreader xmlwriter zip \
 
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_php5-cgi CONFIG_PACKAGE_php5-cli \
@@ -286,6 +286,12 @@ else
   CONFIGURE_ARGS+= --without-mysql
 endif
 
+ifneq ($(SDK)$(CONFIG_PACKAGE_php5-mod-mysqli),)
+  CONFIGURE_ARGS+= --with-mysqli=shared,"$(STAGING_DIR)/usr/bin/mysql_config"
+else
+  CONFIGURE_ARGS+= --without-mysqli
+endif
+
 ifneq ($(SDK)$(CONFIG_PACKAGE_php5-mod-openssl),)
   CONFIGURE_ARGS+= \
 	--with-openssl=shared,"$(STAGING_DIR)/usr" \
@@ -411,6 +417,12 @@ else
   CONFIGURE_ARGS+= --disable-xmlwriter
 endif
 
+ifneq ($(CONFIG_PACKAGE_php5-mod-zip),)
+  CONFIGURE_ARGS+= --enable-zip=shared
+else
+  CONFIGURE_ARGS+= --disable-zip
+endif
+
 ifneq ($(SDK)$(CONFIG_PHP5_FILTER),)
   CONFIGURE_ARGS+= --enable-filter
 else
@@ -458,8 +470,19 @@ define Package/php5-cgi/install
 endef
 
 define Package/php5-fastcgi/install
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_DATA) ./files/php5-fastcgi.config $(1)/etc/config/php5-fastcgi
+
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/php.init $(1)/etc/init.d/php
+	$(INSTALL_BIN) ./files/php5-fastcgi.init $(1)/etc/init.d/php5-fastcgi
+endef
+
+define Build/InstallDev
+	make -C $(PKG_BUILD_DIR) install INSTALL_ROOT=$(PKG_BUILD_DIR)/staging
+	rm -f $(PKG_BUILD_DIR)/staging/usr/bin/php
+	$(CP) $(PKG_BUILD_DIR)/staging/* $(STAGING_DIR_HOST)
+	sed -i -e "s#prefix='/usr'#prefix='$(STAGING_DIR_HOST)/usr'#" $(STAGING_DIR_HOST)/usr/bin/phpize
+	sed -i -e "s#exec_prefix=\"\`eval echo /usr\`\"#exec_prefix='$(STAGING_DIR_HOST)/usr'#" $(STAGING_DIR_HOST)/usr/bin/phpize
 endef
 
 define BuildModule
@@ -511,6 +534,7 @@ $(eval $(call BuildModule,libevent,libevent,+PACKAGE_php5-mod-libevent:libevent)
 $(eval $(call BuildModule,mbstring,MBString))
 $(eval $(call BuildModule,mcrypt,Mcrypt,+PACKAGE_php5-mod-mcrypt:libmcrypt +PACKAGE_php5-mod-mcrypt:libltdl))
 $(eval $(call BuildModule,mysql,MySQL,+PACKAGE_php5-mod-mysql:libmysqlclient))
+$(eval $(call BuildModule,mysqli,MySQL Improved Extension,+PACKAGE_php5-mod-mysqli:libmysqlclient))
 $(eval $(call BuildModule,openssl,OpenSSL,+PACKAGE_php5-mod-openssl:libopenssl))
 $(eval $(call BuildModule,pcntl,PCNTL))
 $(eval $(call BuildModule,pdo,PHP Data Objects))
@@ -531,3 +555,4 @@ $(eval $(call BuildModule,tokenizer,Tokenizer))
 $(eval $(call BuildModule,xml,XML,+PHP5_LIBXML:libxml2 +!PHP5_LIBXML:libexpat))
 $(eval $(call BuildModule,xmlreader,XMLReader,+@PHP5_LIBXML +PACKAGE_php5-mod-xmlreader:libxml2 +PACKAGE_php5-mod-xmlreader:libiconv))
 $(eval $(call BuildModule,xmlwriter,XMLWriter,+@PHP5_LIBXML +PACKAGE_php5-mod-xmlwriter:libxml2 +PACKAGE_php5-mod-xmlwriter:libiconv))
+$(eval $(call BuildModule,zip,ZIP,+PACKAGE_php5-mod-zip:zlib))

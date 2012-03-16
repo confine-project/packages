@@ -85,8 +85,8 @@ CONFIGURE_VARS += \
 	CXXFLAGS="$$$$CXXFLAGS -fno-builtin -fno-rtti -nostdinc++"  \
 	CPPFLAGS="$$$$CPPFLAGS -I$(STAGING_DIR)/usr/include/uClibc++" \
 	LDFLAGS="$$$$LDFLAGS" \
-	LIBS="-nodefaultlibs -luClibc++ -lm $(LIBGCC_S)" \
-	CLIENTCLIBS="-nodefaultlibs -luClibc++ -lm $(LIBGCC_S)" \
+	LIBS="-nodefaultlibs -lc -luClibc++ -lm $(LIBGCC_S)" \
+	CLIENTCLIBS="-nodefaultlibs -lc -luClibc++ -lm $(LIBGCC_S)" \
 	libnl1_LIBS="-libnl-tiny"
 
 define Build/Compile

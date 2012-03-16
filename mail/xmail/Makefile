@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2007-2009 OpenWrt.org
+# Copyright (C) 2007-2011 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=xmail
 PKG_VERSION:=1.26
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.xmailserver.org/
@@ -37,7 +37,7 @@ define Build/Compile
 		$(TARGET_CONFIGURE_OPTS) \
 		LD="\$$$$(CC)" \
 		CPPFLAGS="$(TARGET_CPPFLAGS) -I$(STAGING_DIR)/usr/include/uClibc++ -fno-builtin -fno-rtti -nostdinc++" \
-		LDFLAGS="$(TARGET_LDFLAGS) -nodefaultlibs -lcrypto -lssl -luClibc++ -ldl -lm -lpthread $(LIBGCC_S)" \
+		LDFLAGS="$(TARGET_LDFLAGS) -nodefaultlibs -lc -lcrypto -lssl -luClibc++ -ldl -lm -lpthread $(LIBGCC_S)" \
 		all
 	tar -cjf $(PKG_BUILD_DIR)/MailRoot.tar.bz2 -C $(PKG_BUILD_DIR)/MailRoot --exclude bin .
 endef
@@ -51,6 +51,10 @@ define Package/xmail/install
 	$(INSTALL_DATA) ./files/xmail.config $(1)/etc/config/xmail
 	$(INSTALL_DIR) $(1)/etc/init.d/
 	$(INSTALL_BIN) ./files/xmail.init $(1)/etc/init.d/xmail
+endef
+
+define Package/xmail/conffiles
+/etc/config/xmail
 endef
 
 $(eval $(call BuildPackage,xmail))

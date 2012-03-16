@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2006-2010 OpenWrt.org
+# Copyright (C) 2006-2012 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mysql
 PKG_VERSION:=5.1.53
-PKG_RELEASE:=3
+PKG_RELEASE:=7
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=\
@@ -37,7 +37,7 @@ endef
 define Package/mysql-server/Default
   SECTION:=utils
   CATEGORY:=Utilities
-  DEPENDS:=+libmysqlclient
+  DEPENDS:=+libmysqlclient +libncurses +libreadline
   TITLE:=MySQL Server
   URL:=http://dev.mysql.com/
   SUBMENU:=database
@@ -62,8 +62,8 @@ CONFIGURE_VARS += \
         CXXFLAGS="$$$$CXXFLAGS -fno-builtin -fno-rtti -nostdinc++"  \
         CPPFLAGS="$$$$CPPFLAGS -I$(STAGING_DIR)/usr/include/uClibc++" \
         LDFLAGS="$$$$LDFLAGS" \
-        LIBS="-nodefaultlibs -luClibc++ -lm $(LIBGCC_S)" \
-        CLIENTCLIBS="-nodefaultlibs -luClibc++ -lm $(LIBGCC_S)" \
+        LIBS="-nodefaultlibs -luClibc++ -lm -lc $(LIBGCC_S)" \
+        CLIENTCLIBS="-nodefaultlibs -luClibc++ -lm -lc $(LIBGCC_S)" \
 
 
 define Build/Configure
@@ -193,6 +193,10 @@ define Package/mysql-server/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/share/mysql/fill_help_tables.sql $(1)/usr/share/mysql/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/share/mysql/mysql_system_tables.sql $(1)/usr/share/mysql/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/share/mysql/mysql_system_tables_data.sql $(1)/usr/share/mysql/
+endef
+
+define Package/mysql-server/conffiles
+/etc/my.cnf
 endef
 
 $(eval $(call BuildPackage,mysql-server))

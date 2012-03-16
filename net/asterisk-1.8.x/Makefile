@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=asterisk18
-PKG_VERSION:=1.8.7.1
+PKG_VERSION:=1.8.10.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=asterisk-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://downloads.asterisk.org/pub/telephony/asterisk/releases/
-PKG_MD5SUM:=a732a608ce60fd523646be618e9da616
+PKG_MD5SUM:=7b0f4c40ff21ffab6d777e4fa16ec724
 
 PKG_BUILD_DIR=$(BUILD_DIR)/asterisk-$(PKG_VERSION)
 
@@ -117,6 +117,18 @@ $(call Package/asterisk18/Default/description)
  Asterisk.
 endef
 
+define Package/asterisk18-res-srtp
+$(call Package/asterisk18/Default)
+  TITLE:=SRTP support
+  DEPENDS:= asterisk18 libsrtp +asterisk18-res-crypto
+endef
+
+define Package/asterisk18-res-srtp/description
+$(call Package/asterisk18/Default/description)
+ This package provides SRTP support to
+ Asterisk.
+endef
+
 define Package/asterisk18-chan-gtalk
 $(call Package/asterisk18/Default)
   TITLE:=GTalk support
@@ -138,6 +150,30 @@ endef
 define Package/asterisk18-chan-mobile/description
 $(call Package/asterisk18/Default/description)
  This package provides the channel chan_mobile support to Asterisk.
+endef
+
+define Package/asterisk18-res-timing-timerfd
+$(call Package/asterisk18/Default)
+  TITLE:= Timerfd Timing Interface
+  DEPENDS:= asterisk18
+endef
+
+define Package/asterisk18-res-timing-pthread
+$(call Package/asterisk18/Default)
+  TITLE:= pthread Timing Interface
+  DEPENDS:= asterisk18
+endef
+
+define Package/asterisk18-res-fax
+$(call Package/asterisk18/Default)
+  TITLE:=Generic FAX Resource for FAX technology resource modules
+  DEPENDS:= asterisk18 +asterisk18-res-timing-pthread
+endef
+
+define Package/asterisk18-res-fax-spandsp
+$(call Package/asterisk18/Default)
+  TITLE:=Spandsp T.38 and G.711 FAX Resource
+  DEPENDS:= asterisk18 +asterisk18-res-fax +libspandsp
 endef
 
 define Package/asterisk18-chan-mgcp
@@ -223,12 +259,28 @@ else
 	--without-mysqlclient
 endif
 
+ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk18-res-fax-spandsp),)
+  CONFIGURE_ARGS+= \
+    --with-spandsp="$(STAGING_DIR)/usr"
+else
+  CONFIGURE_ARGS+= \
+    --without-spandsp
+endif
+
 ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk18-chan-mobile),)
   CONFIGURE_ARGS+= \
 	--with-bluetooth="$(STAGING_DIR)/usr"
 else
   CONFIGURE_ARGS+= \
 	--without-bluetooth
+endif
+
+ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk18-res-srtp),)
+  CONFIGURE_ARGS+= \
+	--with-srtp="$(STAGING_DIR)/usr"
+else
+  CONFIGURE_ARGS+= \
+	--without-srtp
 endif
 
 CONFIGURE_ARGS+= \
@@ -251,7 +303,6 @@ CONFIGURE_ARGS+= \
 	--without-qt \
 	--without-radius \
 	--without-sdl \
-	--without-spandsp \
 	--without-suppserv \
 	--without-tds \
 	--without-termcap \
@@ -435,6 +486,33 @@ define Package/asterisk18-chan-mobile/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/chan_mobile.so $(1)/usr/lib/asterisk/modules/
 endef
 
+define Package/asterisk18-res-timing-timerfd/install
+	$(INSTALL_DIR) $(1)/usr/lib/asterisk/modules
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/res_timing_timerfd.so $(1)/usr/lib/asterisk/modules/
+endef
+
+define Package/asterisk18-res-timing-pthread/install
+	$(INSTALL_DIR) $(1)/usr/lib/asterisk/modules
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/res_timing_pthread.so $(1)/usr/lib/asterisk/modules/
+endef
+
+define Package/asterisk18-res-fax/conffiles
+/etc/asterisk/res_fax.conf
+endef
+
+define Package/asterisk18-res-fax/install
+	$(INSTALL_DIR) $(1)/etc/asterisk
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/etc/asterisk/res_fax.conf $(1)/etc/asterisk/
+	$(INSTALL_DIR) $(1)/usr/lib/asterisk/modules
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/res_fax.so $(1)/usr/lib/asterisk/modules/
+endef
+
+define Package/asterisk18-res-fax-spandsp/install
+	$(INSTALL_DIR) $(1)/etc/asterisk
+	$(INSTALL_DIR) $(1)/usr/lib/asterisk/modules
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/res_fax_spandsp.so $(1)/usr/lib/asterisk/modules/
+endef
+
 define Package/asterisk18-chan-mgcp/conffiles
 /etc/asterisk/mgcp.conf
 endef
@@ -480,6 +558,11 @@ define Package/asterisk18-mysql/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/res_config_mysql.so $(1)/usr/lib/asterisk/modules/
 endef
 
+define Package/asterisk18-res-srtp/install
+	$(INSTALL_DIR) $(1)/usr/lib/asterisk/modules
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/res_srtp.so $(1)/usr/lib/asterisk/modules/
+endef
+
 define Buildasterisk18ModuleTemplate
 
   define Package/asterisk18-$(subst _,-,$(1))
@@ -510,10 +593,15 @@ $(eval $(call BuildPackage,asterisk18-cdr))
 $(eval $(call BuildPackage,asterisk18-res-musiconhold))
 $(eval $(call BuildPackage,asterisk18-chan-gtalk))
 $(eval $(call BuildPackage,asterisk18-chan-mobile))
+$(eval $(call BuildPackage,asterisk18-res-fax))
+$(eval $(call BuildPackage,asterisk18-res-fax-spandsp))
+$(eval $(call BuildPackage,asterisk18-res-timing-timerfd))
+$(eval $(call BuildPackage,asterisk18-res-timing-pthread))
 $(eval $(call BuildPackage,asterisk18-chan-mgcp))
 $(eval $(call BuildPackage,asterisk18-chan-skinny))
 $(eval $(call BuildPackage,asterisk18-curl))
 $(eval $(call BuildPackage,asterisk18-mysql))
+$(eval $(call BuildPackage,asterisk18-res-srtp))
 $(eval $(call Buildasterisk18ModuleTemplate,app_authenticate,Authenticate,support for executing arbitrary authenticate commands))
 $(eval $(call Buildasterisk18ModuleTemplate,app_chanisavail,Channel availability check,support for checking if a channel is available))
 $(eval $(call Buildasterisk18ModuleTemplate,app_chanspy,Channel listen in,support for listening in on any channel))
@@ -562,3 +650,5 @@ $(eval $(call Buildasterisk18ModuleTemplate,app_senddtmf,Send DTMF digits,Sends 
 $(eval $(call Buildasterisk18ModuleTemplate,func_cut,CUT function,CUT function))
 $(eval $(call Buildasterisk18ModuleTemplate,res_clioriginate,Calls via CLI,Originate calls via the CLI))
 $(eval $(call Buildasterisk18ModuleTemplate,app_mixmonitor,Record a call and mix the audio,record a call and mix the audio during the recording))
+$(eval $(call Buildasterisk18ModuleTemplate,app_playtones,Playtones application,play a tone list))
+$(eval $(call Buildasterisk18ModuleTemplate,app_record,Record sound file,to record a sound file))

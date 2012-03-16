@@ -9,12 +9,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=restund
-PKG_VERSION:=0.3.0
+PKG_VERSION:=0.4.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.creytiv.com/pub/
-PKG_MD5SUM:=e82bdb994b26b8c16d799b3dc8dd0008
+PKG_MD5SUM:=fcfda012e04b5402e898da211dc10b6b
 
 restund-mods:= \
 	mysql \
@@ -51,7 +51,7 @@ define Build/Compile
 		CC="$(TARGET_CC)" \
 		EXTRA_CFLAGS="$(TARGET_CFLAGS)" \
 		DESTDIR="$(PKG_INSTALL_DIR)" \
-		SYSROOT="$(TOOLCHAIN_DIR)" \
+		SYSROOT="$$$$($(FIND) $(TOOLCHAIN_DIR) -path '*/include/pthread.h' | sed -ne '1s#/include/pthread.h##p')" \
 		SYSROOT_ALT="$(STAGING_DIR)/usr" \
 		RELEASE=1 \
 		CROSS_COMPILE="$(TARGET_CROSS)" \
@@ -81,6 +81,9 @@ define Package/restund/install
 	$(INSTALL_BIN) ./files/restund.init $(1)/etc/init.d/restund
 endef
 
+define Package/restund/conffiles
+/etc/restund.conf
+endef
 
 #
 # 1. Name

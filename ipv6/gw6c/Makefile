@@ -6,7 +6,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gw6c
 PKG_VERSION:=5.1
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://openwrt.linux-appliance.net/sources
@@ -56,7 +56,7 @@ define Build/Compile
 			-I$(PKG_BUILD_DIR)/tspc-advanced/platform/openwrt -I$(PKG_BUILD_DIR)/tspc-advanced" \
 		LDFLAGS="-L$(PKG_BUILD_DIR)/tspc-advanced/gw6cconfig \
 			-L$(PKG_BUILD_DIR)/tspc-advanced/gw6cmessaging \
-			$(TARGET_LDFLAGS) -nodefaultlibs -luClibc++ $(LIBGCC_S)" \
+			$(TARGET_LDFLAGS) -nodefaultlibs -lc -luClibc++ $(LIBGCC_S)" \
 		target="openwrt" \
 		installdir="$(PKG_INSTALL_DIR)"
 endef
@@ -70,6 +70,10 @@ define Package/gw6c/install
 	$(INSTALL_BIN) ./files/gw6c.init $(1)/etc/init.d/gw6c
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/gw6c.config $(1)/etc/config/gw6c
+endef
+
+define Package/gw6c/conffiles
+/etc/config/gw6c
 endef
 
 $(eval $(call BuildPackage,gw6c))

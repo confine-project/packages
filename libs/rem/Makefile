@@ -9,12 +9,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=rem
-PKG_VERSION:=0.3.0
+PKG_VERSION:=0.4.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.creytiv.com/pub
-PKG_MD5SUM:=54022d8819c706ea460f6da9b5121ee4
+PKG_MD5SUM:=0d5cf133a62d11a2f80875a8fa7adab6
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -37,7 +37,7 @@ define Build/Compile
 		EXTRA_CFLAGS="$(TARGET_CFLAGS) -DOPENWRT" \
 		EXTRA_LFLAGS="-lm" \
 		DESTDIR="$(PKG_INSTALL_DIR)" \
-		SYSROOT="$(TOOLCHAIN_DIR)" \
+		SYSROOT="$$$$($(FIND) $(TOOLCHAIN_DIR) -path '*/include/pthread.h' | sed -ne '1s#/include/pthread.h##p')" \
 		SYSROOT_ALT="$(STAGING_DIR)/usr" \
 		RELEASE=1 \
 		CROSS_COMPILE="$(TARGET_CROSS)" \

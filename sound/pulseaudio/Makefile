@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=pulseaudio
 PKG_VERSION:=1.1
-PKG_RELEASE:=1
+PKG_RELEASE:=6
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://freedesktop.org/software/pulseaudio/releases/
@@ -44,7 +44,7 @@ endef
 
 define Package/pulseaudio-daemon-avahi
   $(call Package/pulseaudio/Default)
-  DEPENDS+=+dbus +libavahi-client +avahi-daemon-dbus
+  DEPENDS+=+dbus +libavahi-client +avahi-daemon
   TITLE+= (avahi)
   VARIANT:=avahi
 endef
@@ -94,9 +94,9 @@ define Package/pulseaudio-profiles
 endef
 
 CONFIGURE_ARGS += \
-	--with-system-user=root \
-	--with-system-group=root \
-	--with-access-group=root \
+	--with-system-user=pulse \
+	--with-system-group=pulse \
+	--with-access-group=audio \
 	--with-database=simple \
 	--enable-alsa \
 	--disable-hal \
@@ -104,7 +104,7 @@ CONFIGURE_ARGS += \
 	--disable-tcpwrap \
 	--disable-nls \
 	--disable-manpages \
-	--disable-oss-output \
+	--enable-oss-output \
 	--disable-oss-wrapper \
 	--disable-samplerate \
 	--disable-per-user-esound-socket \
@@ -121,10 +121,11 @@ CONFIGURE_ARGS += \
 	--enable-avahi \
 	--enable-dbus
 endif
+
 ifeq ($(BUILD_VARIANT),noavahi)
 CONFIGURE_ARGS += \
 	--disable-avahi \
-	--disable-dbus	
+	--disable-dbus
 endif
 
 CONFIGURE_VARS += \
@@ -180,6 +181,8 @@ define Package/pulseaudio-daemon/install
 	$(CP) \
 		$(PKG_INSTALL_DIR)/usr/lib/pulse-$(PKG_VERSION)/modules/module*.so \
 		$(1)/usr/lib/pulse-$(PKG_VERSION)/modules/
+
+	chmod -R 0644 $(1)/etc/pulse/*
 endef
 
 define Package/pulseaudio-daemon-avahi/install
@@ -219,9 +222,7 @@ define Package/pulseaudio-daemon-avahi/install
 		$(PKG_INSTALL_DIR)/etc/dbus-1/system.d/pulseaudio-system.conf \
 		$(1)/etc/dbus-1/system.d/pulseaudio-system.conf
 
-	$(SED) \
-		's/user="pulse"/user="root"/' \
-		$(1)/etc/dbus-1/system.d/pulseaudio-system.conf
+	chmod -R 0644 $(1)/etc/pulse/* $(1)/etc/dbus-1/system.d/pulseaudio-system.conf
 endef
 
 define Package/pulseaudio-tools/install

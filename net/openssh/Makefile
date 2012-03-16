@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openssh
 PKG_VERSION:=5.9p1
-PKG_RELEASE:=2
+PKG_RELEASE:=4
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/ \
@@ -25,7 +25,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/openssh/Default
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+libopenssl +zlib +libgcc
+  DEPENDS:=+libopenssl +zlib
   TITLE:=OpenSSH
   MAINTAINER:=Peter Wagner <tripolar@gmx.at>
   URL:=http://www.openssh.com/
@@ -100,7 +100,6 @@ endef
 
 define Package/openssh-sftp-server
   $(call Package/openssh/Default)
-  DEPENDS:=+libgcc
   TITLE+= SFTP server
 endef
 
@@ -111,6 +110,8 @@ endef
 CONFIGURE_ARGS+= \
 	$(DISABLE_NLS) \
 	--sysconfdir=/etc/ssh \
+	--with-privsep-user=sshd \
+	--with-privsep-path=/var/empty \
 	--enable-shared \
 	--disable-static \
 	--disable-debug \
@@ -125,6 +126,11 @@ CONFIGURE_ARGS+= \
 	--without-kerberos5 \
 	--without-pam \
 	--without-x
+
+ifeq ($(CONFIG_OPENSSL_ENGINE),y)
+CONFIGURE_ARGS+= \
+	--with-ssl-engine
+endif
 
 ifneq ($(CONFIG_SSP_SUPPORT),y)
 CONFIGURE_ARGS += \

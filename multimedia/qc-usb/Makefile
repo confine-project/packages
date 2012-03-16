@@ -38,7 +38,7 @@ define KernelPackage/video-quickcam
 $(call Package/qc-usb/Default)
   SUBMENU:=Video Support
   TITLE:=QuickCam Express USB webcam support
-  DEPENDS:=@USB_SUPPORT @LINUX_2_4||LINUX_2_6_25||LINUX_2_6_27||LINUX_2_6_28 +kmod-usb-core +kmod-video-core
+  DEPENDS:=@USB_SUPPORT @LINUX_2_6_25||LINUX_2_6_27||LINUX_2_6_28 +kmod-usb-core +kmod-video-core
   FILES:=$(PKG_BUILD_DIR)/quickcam.$(LINUX_KMOD_SUFFIX)
   AUTOLOAD:=$(call AutoLoad,90,quickcam)
 endef
@@ -64,7 +64,7 @@ ifneq ($(CONFIG_PACKAGE_kmod-video-quickcam),)
 		ARCH="$(LINUX_KARCH)" \
 		CROSS_COMPILE="$(TARGET_CROSS)" \
 		CC="$(TARGET_CC)" \
-		LD="$(TARGET_CC) -nodefaultlibs -nostartfiles" \
+		LD="$(TARGET_CC) -nodefaultlibs -lc -nostartfiles" \
 		USER_OPT="$(KERNEL_C_OPTS)" \
 		quickcam.$(LINUX_KMOD_SUFFIX)
   endef
