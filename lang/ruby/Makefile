@@ -207,7 +207,6 @@ CONFIGURE_ARGS += \
 	--enable-static \
 	--disable-rpath \
 	--enable-ipv6 \
-	--enable-wide-getaddrinfo \
 	--with-ruby-version=minor \
 	--with-iconv-dir=$(ICONV_PREFIX) \
 
