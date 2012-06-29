@@ -77,7 +77,7 @@ endef
 
 define Package/openssh-server
   $(call Package/openssh/Default)
-  DEPENDS+= +openssh-keygen
+  DEPENDS+= +openssh-keygen +libcryptoxx
   TITLE+= server
 endef
 
