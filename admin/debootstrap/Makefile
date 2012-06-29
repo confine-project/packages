@@ -14,9 +14,9 @@ PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-udeb_$(PKG_VERSION)_all.udeb
 PKG_SOURCE_URL:=http://ftp.debian.org/debian/pool/main/d/debootstrap
-PKG_MD5SUM:=298ed4d39eda12b9db46f446465d6f7f
+PKG_MD5SUM:=cd489fdbc34d751aaf0960598ccfc9f2
 
-UNPACK_CMD=ar -p "$(DL_DIR)/$(PKG_SOURCE)" data.tar.gz | ( cd $(1) && tar -xzf - )
+UNPACK_CMD=ar -p "$(DL_DIR)/$(PKG_SOURCE)" data.tar.xz | ( cd $(1) && tar -xJf - )
 
 include $(INCLUDE_DIR)/package.mk
 
