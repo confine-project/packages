@@ -74,6 +74,7 @@ define Build/Compile
 		STAGING_DIR="$(STAGING_DIR)" \
 		PREFIX="/usr" \
 		MACHINE="$(ARCH)" \
+		EXLDFLAGS="" \
 		user
 endef
 
