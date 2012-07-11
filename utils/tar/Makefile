@@ -22,7 +22,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/tar
   SECTION:=utils
   CATEGORY:=Utilities
-  DEPENDS:=+bzip2
+  DEPENDS:=+bzip2 +librt
   TITLE:=GNU tar
   URL:=http://www.gnu.org/software/tar/
 endef
