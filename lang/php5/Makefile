@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=php
 PKG_VERSION:=5.3.10
-PKG_RELEASE:=1
+PKG_RELEASE:=4
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://www.php.net/distributions/
@@ -20,7 +20,7 @@ PKG_BUILD_PARALLEL:=1
 
 PHP5_MODULES = \
 	apc \
-	ctype curl \
+	calendar ctype curl \
 	fileinfo \
 	dio dom \
 	exif \
@@ -33,7 +33,7 @@ PHP5_MODULES = \
 	mbstring mcrypt mysql mysqli \
 	openssl \
 	pcntl pdo pdo-mysql pdo-pgsql pdo-sqlite pgsql \
-	session simplexml soap sockets sqlite sqlite3 sysvmsg sysvsem sysvshm \
+	session shmop simplexml soap sockets sqlite sqlite3 sysvmsg sysvsem sysvshm \
 	tokenizer \
 	xml xmlreader xmlwriter zip \
 
@@ -56,7 +56,7 @@ define Package/php5/Default
 endef
 
 define Package/php5/Default/description
-  PHP is a widely-used general-purpose scripting language that is especially 
+  PHP is a widely-used general-purpose scripting language that is especially
   suited for Web development and can be embedded into HTML.
 endef
 
@@ -89,7 +89,7 @@ endef
 
 define Package/php5/description
   $(call Package/php5/Default/description)
-  This package contains only the PHP config file. You must actually choose 
+  This package contains only the PHP config file. You must actually choose
   your PHP flavour (cli, cgi or fastcgi).
 endef
 
@@ -157,6 +157,12 @@ ifneq ($(SDK)$(CONFIG_PACKAGE_php5-mod-apc),)
   CONFIGURE_ARGS+= --enable-apc=shared --disable-apc-mmap --disable-apc-pthreadmutex
 else
   CONFIGURE_ARGS+= --disable-apc
+endif
+
+ifneq ($(SDK)$(CONFIG_PACKAGE_php5-mod-calendar),)
+  CONFIGURE_ARGS+= --enable-calendar=shared
+else
+  CONFIGURE_ARGS+= --disable-calendar
 endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_php5-mod-ctype),)
@@ -340,6 +346,12 @@ else
   CONFIGURE_ARGS+= --disable-session
 endif
 
+ifneq ($(SDK)$(CONFIG_PACKAGE_php5-mod-shmop),)
+  CONFIGURE_ARGS+= --enable-shmop=shared
+else
+  CONFIGURE_ARGS+= --disable-shmop
+endif
+
 ifneq ($(SDK)$(CONFIG_PACKAGE_php5-mod-simplexml),)
   CONFIGURE_ARGS+= --enable-simplexml=shared
 else
@@ -515,22 +527,23 @@ $(eval $(call BuildPackage,php5-fastcgi))
 
 #$(eval $(call BuildModule,NAME,TITLE[,PKG DEPENDS]))
 $(eval $(call BuildModule,apc,APC,+PACKAGE_php5-mod-apc:librt))
+$(eval $(call BuildModule,calendar,Calendar))
 $(eval $(call BuildModule,ctype,Ctype))
 $(eval $(call BuildModule,curl,cURL,+PACKAGE_php5-mod-curl:libcurl))
 $(eval $(call BuildModule,fileinfo,Fileinfo,+PACKAGE_php5-mod-fileinfo:libmagic))
 $(eval $(call BuildModule,dio,Direct IO))
 $(eval $(call BuildModule,dom,DOM,+@PHP5_LIBXML +PACKAGE_php5-mod-dom:libxml2))
 $(eval $(call BuildModule,exif,EXIF))
-$(eval $(call BuildModule,ftp,FTP))
+$(eval $(call BuildModule,ftp,FTP,+PACKAGE_php5-mod-ftp:libopenssl))
 $(eval $(call BuildModule,gettext,Gettext,+PACKAGE_php5-mod-gettext:libintl-full))
 $(eval $(call BuildModule,gd,GD graphics,+PACKAGE_php5-mod-gd:libgd))
 $(eval $(call BuildModule,gmp,GMP,+PACKAGE_php5-mod-gmp:libgmp))
 $(eval $(call BuildModule,hash,Hash))
-$(eval $(call BuildModule,http,HTTP,+PACKAGE_php5-mod-http:libcurl +PACKAGE_php5-mod-http:librt))
+$(eval $(call BuildModule,http,HTTP,+PACKAGE_php5-mod-http:libcurl +PACKAGE_php5-mod-http:libevent2 +PACKAGE_php5-mod-http:librt))
 $(eval $(call BuildModule,iconv,iConv,+PACKAGE_php5-mod-iconv:libiconv))
 $(eval $(call BuildModule,json,JSON))
 $(eval $(call BuildModule,ldap,LDAP,+PACKAGE_php5-mod-ldap:libopenldap +PACKAGE_php5-mod-ldap:libsasl2))
-$(eval $(call BuildModule,libevent,libevent,+PACKAGE_php5-mod-libevent:libevent))
+$(eval $(call BuildModule,libevent,libevent,+PACKAGE_php5-mod-libevent:libevent2))
 $(eval $(call BuildModule,mbstring,MBString))
 $(eval $(call BuildModule,mcrypt,Mcrypt,+PACKAGE_php5-mod-mcrypt:libmcrypt +PACKAGE_php5-mod-mcrypt:libltdl))
 $(eval $(call BuildModule,mysql,MySQL,+PACKAGE_php5-mod-mysql:libmysqlclient))
@@ -540,9 +553,10 @@ $(eval $(call BuildModule,pcntl,PCNTL))
 $(eval $(call BuildModule,pdo,PHP Data Objects))
 $(eval $(call BuildModule,pdo-mysql,PDO driver for MySQL,+php5-mod-pdo +PACKAGE_php5-mod-pdo-mysql:libmysqlclient))
 $(eval $(call BuildModule,pdo-pgsql,PDO driver for PostgreSQL,+php5-mod-pdo +PACKAGE_php5-mod-pdo-pgsql:libpq))
-$(eval $(call BuildModule,pdo-sqlite,PDO driver for SQLite 3.x,+php5-mod-pdo +PACKAGE_php5-mod-pdo-sqlite:libsqlite3 +PACKAGE_php5-mod-pdo-sqlite:libpthread))
+$(eval $(call BuildModule,pdo-sqlite,PDO driver for SQLite 3.x,+php5-mod-pdo +PACKAGE_php5-mod-pdo-sqlite:libsqlite3 +PACKAGE_php5-mod-pdo-sqlite:libpthread +PACKAGE_php5-mod-pdo-sqlite:librt))
 $(eval $(call BuildModule,pgsql,PostgreSQL,+PACKAGE_php5-mod-pgsql:libpq))
 $(eval $(call BuildModule,session,Session))
+$(eval $(call BuildModule,shmop,Shared Memory))
 $(eval $(call BuildModule,simplexml,SimpleXML,+@PHP5_LIBXML +PACKAGE_php5-mod-simplexml:libxml2))
 $(eval $(call BuildModule,soap,SOAP,+@PHP5_LIBXML +PACKAGE_php5-mod-soap:libxml2))
 $(eval $(call BuildModule,sockets,Sockets))

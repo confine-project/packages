@@ -16,7 +16,7 @@ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@SF/sox
 PKG_MD5SUM:=6c95af60b20b9655531bf3162c0be937
 
-PKG_FIXUP = libtool
+PKG_FIXUP:=autoreconf
 
 PKG_INSTALL:=1
 
@@ -30,7 +30,7 @@ TARGET_LDFLAGS+= \
 define Package/sox
   SECTION:=sound
   CATEGORY:=Sound
-  DEPENDS:=+BUILD_PATENTED:lame-lib +BUILD_PATENTED:libmad +BUILD_PATENTED:libid3tag +libvorbis +libvorbisidec +libgsm
+  DEPENDS:=+BUILD_PATENTED:lame-lib +BUILD_PATENTED:libmad +BUILD_PATENTED:libid3tag +libvorbis +libvorbisidec +libgsm +alsa-lib +libsndfile
   TITLE:=Sox is a general purpose sound converter/player/recorder
   URL:=http://sox.sourceforge.net/
 endef

@@ -9,11 +9,11 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=xtables-addons
-PKG_VERSION:=1.41
-PKG_RELEASE:=3
+PKG_VERSION:=1.42
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_MD5SUM:=a8de5e5e5823aefcbab210159f122564
+PKG_MD5SUM:=7c996a0400667b57ab4fb53a013ae742
 PKG_SOURCE_URL:=@SF/xtables-addons
 PKG_BUILD_DEPENDS:=iptables
 PKG_INSTALL:=1
@@ -116,7 +116,7 @@ $(eval $(call BuildTemplate,fuzzy,fuzzy,xt_fuzzy,xt_fuzzy,46,))
 $(eval $(call BuildTemplate,geoip,geoip,xt_geoip,xt_geoip,46,))
 $(eval $(call BuildTemplate,iface,iface,xt_iface,xt_iface,46,))
 $(eval $(call BuildTemplate,ipmark,IPMARK,xt_IPMARK,xt_IPMARK,46,+kmod-ipt-compat-xtables))
-$(eval $(call BuildTemplate,ipp2p,IPP2P,xt_ipp2p,xt_ipp2p,46,))
+$(eval $(call BuildTemplate,ipp2p,IPP2P,xt_ipp2p,xt_ipp2p,46,+kmod-ipt-compat-xtables))
 $(eval $(call BuildTemplate,ipv4options,ipv4options,xt_ipv4options,xt_ipv4options,46,))
 $(eval $(call BuildTemplate,length2,length2,xt_length2,xt_length2,46,))
 $(eval $(call BuildTemplate,logmark,LOGMARK,xt_LOGMARK,xt_LOGMARK,46,+kmod-ipt-compat-xtables))

@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mdadm
-PKG_VERSION:=3.2
+PKG_VERSION:=3.2.3
 PKG_RELEASE:=1
 
 PKG_SOURCE_URL:=@KERNEL/linux/utils/raid/mdadm
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_MD5SUM:=4ac70ccead74f947bf5aa4d189a977a0
+PKG_MD5SUM:=7ba1649353b60d8a028af27d9c3ca788
 
 PKG_BUILD_PARALLEL:=1
 
@@ -34,7 +34,7 @@ endef
 define Build/Compile
 	$(MAKE) -C $(PKG_BUILD_DIR) \
 		CC="$(TARGET_CC)" \
-		CFLAGS="$(TARGET_CFLAGS) -DUCLIBC -DHAVE_STDINT_H" \
+		CFLAGS="$(TARGET_CFLAGS) -DHAVE_STDINT_H" \
 		LDFLAGS="$(TARGET_LDFLAGS)" \
 		mdadm mdassemble
 endef

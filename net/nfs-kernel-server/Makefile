@@ -7,9 +7,9 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=nfs-kernel-server
-PKG_VERSION:=1.2.5
-PKG_RELEASE:=2
-PKG_MD5SUM:=8395ac770720b83c5c469f88306d7765
+PKG_VERSION:=1.2.6
+PKG_RELEASE:=1
+PKG_MD5SUM:=8be543ca270c2234ff18f8c8d35e0d37
 
 PKG_SOURCE_URL:=@SF/nfs
 PKG_SOURCE:=nfs-utils-$(PKG_VERSION).tar.bz2
@@ -76,7 +76,13 @@ CONFIGURE_ARGS += \
 	--disable-nfsv41 \
 	--enable-static \
 	--enable-shared \
-	--disable-caps
+	--disable-caps \
+	--disable-tirpc \
+	--disable-nfsdcld
+
+CONFIGURE_VARS += \
+	CONFIG_SQLITE3_TRUE="\#" \
+	CONFIG_NFSDCLD_TRUE="\#"
 
 MAKE_FLAGS += \
 	OPT="$(TARGET_CFLAGS)" \
@@ -104,7 +110,8 @@ HOST_CONFIGURE_VARS += \
 	GSSGLUE_LIBS=" " \
 	RPCSECGSS_CFLAGS=" " \
 	RPCSECGSS_LIBS=" " \
-
+	CONFIG_SQLITE3_TRUE="\#" \
+	CONFIG_NFSDCLD_TRUE="\#"
 
 define Host/Compile
 	$(MAKE) -C $(HOST_BUILD_DIR)/tools/rpcgen all
