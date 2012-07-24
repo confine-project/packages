@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 OpenWrt.org
+# Copyright (C) 2011,2012 OpenWrt.org
 # Copyright (C) 2010 Jo-Philipp Wich <xm@subsignal.org>
 #
 # This is free software, licensed under the GNU General Public License v2.
@@ -9,12 +9,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mosquitto
-PKG_VERSION:=0.14.4
+PKG_VERSION:=0.15
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://mosquitto.org/files/source/
-PKG_MD5SUM:=88750338c2096671c01cf7e461d5c06d
+PKG_MD5SUM:=7ae0ac38f1f379578ab5530e5dc7269e
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -72,6 +72,8 @@ define Package/mosquitto/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/mosquitto $(1)/usr/sbin/mosquitto
 	$(INSTALL_DIR) $(1)/etc/mosquitto
 	$(INSTALL_CONF) $(PKG_BUILD_DIR)/mosquitto.conf $(1)/etc/mosquitto/mosquitto.conf
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/mosquitto.init $(1)/etc/init.d/mosquitto
 endef
 
 define Package/mosquitto-client/install

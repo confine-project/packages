@@ -18,7 +18,7 @@ PKG_MD5SUM:=1b76932ca7c4b2aa992941e41ed4594b
 PKG_BUILD_DIR=$(BUILD_DIR)/$(PKG_NAME)-$(BUILD_VARIANT)/$(PKG_NAME)-$(PKG_VERSION)
 PKG_BUILD_DEPENDS:=intltool/host
 
-PKG_FIXUP = libtool
+PKG_FIXUP:=autoreconf
 
 PKG_INSTALL = 1
 
@@ -30,11 +30,10 @@ define Package/pulseaudio/Default
   SECTION:=sound
   CATEGORY:=Sound
   DEPENDS:=+libspeexdsp +libsndfile +libltdl +libpthread \
-	+librt +alsa-lib +libjson $(ICONV_DEPENDS) $(INTL_DEPENDS) \
-	@!UCLIBC_VERSION_0_9_30_1 @!UCLIBC_VERSION_0_9_30_2 \
-	@!UCLIBC_VERSION_0_9_30_3
+	+librt +alsa-lib +libjson +libopenssl +udev $(ICONV_DEPENDS) $(INTL_DEPENDS)
   TITLE:=Network sound server
   URL:=http://www.pulseaudio.org
+  PROVIDES:=pulseaudio
 endef
 
 define Package/pulseaudio-daemon
@@ -79,7 +78,7 @@ endef
 define Package/pulseaudio-tools
   SECTION:=sound
   CATEGORY:=Sound
-  DEPENDS:=+libsndfile @PACKAGE_pulseaudio-daemon||PACKAGE_pulseaudio-daemon-avahi #+libpulse
+  DEPENDS:=+libsndfile pulseaudio
   TITLE:=Tools for Pulseaudio
   URL:=http://www.pulseaudio.org
   VARIANT:=noavahi
@@ -88,7 +87,7 @@ endef
 define Package/pulseaudio-profiles
   SECTION:=sound
   CATEGORY:=Sound
-  DEPENDS:=@PACKAGE_pulseaudio-daemon||PACKAGE_pulseaudio-daemon-avahi
+  DEPENDS:=pulseaudio
   TITLE:=Profiles for Pulseaudio
   URL:=http://www.pulseaudio.org
 endef
@@ -114,7 +113,8 @@ CONFIGURE_ARGS += \
 	--disable-asyncns \
 	--disable-lirc \
 	--disable-bluez \
-	--without-caps
+	--without-caps \
+	--without-fftw
 
 ifeq ($(BUILD_VARIANT),avahi)
 CONFIGURE_ARGS += \

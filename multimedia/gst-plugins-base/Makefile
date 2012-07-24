@@ -31,7 +31,7 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_gst-mod-volume \
 	CONFIG_PACKAGE_gst-mod-vorbis \
 
-PKG_FIXUP:=libtool
+PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
@@ -176,7 +176,7 @@ endef
 
 $(eval $(call GstBuildLibrary,app,app,,))
 $(eval $(call GstBuildLibrary,audio,audio,interfaces,))
-$(eval $(call GstBuildLibrary,cdda,CDDA,,))
+$(eval $(call GstBuildLibrary,cdda,CDDA,tag,))
 $(eval $(call GstBuildLibrary,fft,FFT,,))
 $(eval $(call GstBuildLibrary,interfaces,interfaces,))
 $(eval $(call GstBuildLibrary,netbuffer,network buffer,,))
@@ -231,9 +231,9 @@ $(eval $(call GstBuildPlugin,decodebin,media decoder,pbutils,,))
 $(eval $(call GstBuildPlugin,decodebin2,media decoder (v2),pbutils,,))
 $(eval $(call GstBuildPlugin,gio,GIO,,,))
 $(eval $(call GstBuildPlugin,ogg,Ogg,riff tag,,+libogg))
-$(eval $(call GstBuildPlugin,playbin,playback,interfaces pbutils,,))
+$(eval $(call GstBuildPlugin,playbin,playback,video interfaces pbutils,,))
 $(eval $(call GstBuildPlugin,tcp,TCP,dataprotocol,,))
-$(eval $(call GstBuildPlugin,theora,Theora,tag,ogg,+libtheora))
+$(eval $(call GstBuildPlugin,theora,Theora,video tag,ogg,+libtheora))
 $(eval $(call GstBuildPlugin,typefindfunctions,'typefind' functions,,,))
 $(eval $(call GstBuildPlugin,videotestsrc,video test,,,+liboil))
 $(eval $(call GstBuildPlugin,volume,volume,audio controller,,+liboil))

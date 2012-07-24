@@ -10,10 +10,11 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=batman-adv
 
-PKG_VERSION:=2012.0.0
-BATCTL_VERSION:=2012.0.0
-PKG_MD5SUM:=f1de23457a47ca4369ee1f0e0b7fc405
-BATCTL_MD5SUM:=27991c2921e18657c7262e917d45106a
+PKG_VERSION:=2012.2.0
+BATCTL_VERSION:=2012.2.0
+PKG_RELEASE:=2
+PKG_MD5SUM:=68967ed1df709de18ab795722dde9341
+BATCTL_MD5SUM:=7abd284098c514d3f2858e8a956c495e
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://downloads.open-mesh.org/batman/releases/batman-adv-$(PKG_VERSION)
@@ -28,7 +29,7 @@ define KernelPackage/batman-adv
   URL:=http://www.open-mesh.org/
   MAINTAINER:=Marek Lindner <lindner_marek@yahoo.de>
   SUBMENU:=Network Support
-  DEPENDS:=+kmod-lib-crc16
+  DEPENDS:=+kmod-lib-crc16 +libc
   TITLE:=B.A.T.M.A.N. Adv
   FILES:=$(PKG_BUILD_DIR)/batman-adv.$(LINUX_KMOD_SUFFIX)
   AUTOLOAD:=$(call AutoLoad,50,batman-adv)
@@ -47,12 +48,15 @@ endef
 
 MAKE_BATMAN_ADV_ARGS += \
 	CROSS_COMPILE="$(TARGET_CROSS)" \
+	KERNELPATH="$(LINUX_DIR)" \
 	ARCH="$(LINUX_KARCH)" \
 	PATH="$(TARGET_PATH)" \
-	$(if $(CONFIG_KMOD_BATMAN_ADV_DEBUG_LOG),EXTRA_CFLAGS="-DCONFIG_BATMAN_ADV_DEBUG") \
 	SUBDIRS="$(PKG_BUILD_DIR)" \
+	PWD="$(PKG_BUILD_DIR)" \
 	LINUX_VERSION="$(LINUX_VERSION)" \
-	REVISION="" modules
+	CONFIG_BATMAN_ADV_DEBUG=$(if $(CONFIG_KMOD_BATMAN_ADV_DEBUG_LOG),y,n) \
+	CONFIG_BATMAN_ADV_BLA=$(if $(CONFIG_KMOD_BATMAN_ADV_BLA),y,n) \
+	REVISION="" all
 
 MAKE_BATCTL_ARGS += \
 	CFLAGS="$(TARGET_CFLAGS)" \
@@ -96,8 +100,7 @@ define Build/Patch
 endef
 
 define Build/Compile
-	cp $(PKG_BUILD_DIR)/Makefile.kbuild $(PKG_BUILD_DIR)/Makefile
-	$(MAKE) -C "$(LINUX_DIR)" $(MAKE_BATMAN_ADV_ARGS)
+	$(MAKE) -C "$(PKG_BUILD_DIR)" $(MAKE_BATMAN_ADV_ARGS)
 	$(BATCTL_BUILD)
 endef
 

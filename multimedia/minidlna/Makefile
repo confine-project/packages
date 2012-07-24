@@ -16,6 +16,7 @@ PKG_SOURCE_URL:=@SF/minidlna
 PKG_MD5SUM:=be9b4c91e3fcde592dc3f9828098ca0f
 
 PKG_BUILD_PARALLEL:=0
+PKG_BUILD_DEPENDS:=util-linux
 
 include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
@@ -75,12 +76,16 @@ MAKE_VARS +=\
 
 
 define Package/minidlna/install
-	$(INSTALL_DIR) $(1)/etc
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/minidlna.conf $(1)/etc/
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/minidlna $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/minidlna.init $(1)/etc/init.d/minidlna
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) ./files/minidlna.config $(1)/etc/config/minidlna
+endef
+
+define Package/minidlna/conffiles
+/etc/config/minidlna
 endef
 
 $(eval $(call BuildPackage,minidlna))

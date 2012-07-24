@@ -1,21 +1,20 @@
 #
-# Copyright (C) 2007 OpenWrt.org
+# Copyright (C) 2007-2012 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
 #
-# $Id$
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=samba
-PKG_VERSION:=3.6.3
-PKG_RELEASE:=1
+PKG_VERSION:=3.6.5
+PKG_RELEASE:=2
 
-PKG_SOURCE_URL_SUBDIR:=/
-PKG_SOURCE_URL:=http://ftp.samba.org/pub/samba$(PKG_SOURCE_URL_SUBDIR)
+PKG_SOURCE_URL:=http://ftp.samba.org/pub/samba \
+	http://ftp.samba.org/pub/samba/old-versions
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_MD5SUM:=98ac9db9f4b6ebfc3f013aa193ffb0d1
+PKG_MD5SUM:=2f0c14547333c1b48fd4728b031e7040
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -31,9 +30,18 @@ define Package/samba36-server
   URL:=http://www.samba.org/
 endef
 
+define Package/samba36-client
+  SECTION:=net
+  CATEGORY:=Network
+  TITLE:=Samba 3.6 SMB/CIFS client
+  URL:=http://www.samba.org/
+  DEPENDS:=+libreadline +libncurses
+endef
+
 define Package/samba36-server/config
 	config PACKAGE_SAMBA_MAX_DEBUG_LEVEL
 		int "Maximum level of compiled-in debug messages"
+		depends PACKAGE_samba36-server || PACKAGE_samba36-client
 		default -1
 
 endef
@@ -120,5 +128,12 @@ define Package/samba36-server/install
 	ln -sf samba_multicall $(1)/usr/sbin/smbpasswd
 endef
 
+define Package/samba36-client/install
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_BIN)/smbclient $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_BIN)/nmblookup $(1)/usr/sbin
+endef
+
+$(eval $(call BuildPackage,samba36-client))
 $(eval $(call BuildPackage,samba36-server))
 
