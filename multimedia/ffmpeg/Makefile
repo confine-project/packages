@@ -167,7 +167,7 @@ $(call Package/ffmpeg/Default)
  SECTION:=multimedia
  CATEGORY:=Multimedia
  TITLE+= program
- DEPENDS+= +libpthread +libffmpeg
+ DEPENDS+= +libpthread +libffmpeg-full
  VARIANT:=full
 endef
 
@@ -183,7 +183,7 @@ $(call Package/ffmpeg/Default)
  SECTION:=multimedia
  CATEGORY:=Multimedia
  TITLE+= CLI media identifier
- DEPENDS+= +libffmpeg
+ DEPENDS+= +libffmpeg-full
  VARIANT:=full
 endef
 
@@ -199,7 +199,7 @@ $(call Package/ffserver/Default)
  SECTION:=multimedia
  CATEGORY:=Multimedia
  TITLE+= streaming server
- DEPENDS+= +libpthread +libffmpeg
+ DEPENDS+= +libpthread +libffmpeg-full
  VARIANT:=full
 endef
 
@@ -215,7 +215,7 @@ $(call Package/ffmpeg/Default)
  SECTION:=libs
  CATEGORY:=Libraries
  TITLE+= libraries
- DEPENDS+= +libpthread +zlib
+ DEPENDS+= +libpthread +zlib +libbz2
  PROVIDES:= libffmpeg
 endef
 
@@ -292,6 +292,7 @@ FFMPEG_CONFIGURE:= \
 	--enable-small \
 	--disable-stripping \
 	--enable-zlib \
+	--disable-outdevs
 
 ifeq ($(BUILD_VARIANT),custom)
 

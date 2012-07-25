@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2008-2010 OpenWrt.org
+# Copyright (C) 2008-2012 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=asterisk18
-PKG_VERSION:=1.8.10.0
+PKG_VERSION:=1.8.10.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=asterisk-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://downloads.asterisk.org/pub/telephony/asterisk/releases/
-PKG_MD5SUM:=7b0f4c40ff21ffab6d777e4fa16ec724
+PKG_MD5SUM:=415738d347b9037cbe5f8bfbe66843de
 
 PKG_BUILD_DIR=$(BUILD_DIR)/asterisk-$(PKG_VERSION)
 
@@ -57,7 +57,6 @@ $(call Package/asterisk18/Default/description)
  This package contains sound files for Asterisk.
 endef
 
-
 define Package/asterisk18-voicemail
 $(call Package/asterisk18/Default)
   TITLE:=Voicemail support
@@ -96,7 +95,7 @@ endef
 define Package/asterisk18-cdr
 $(call Package/asterisk18/Default)
   TITLE:=CDR support
-  DEPENDS:= asterisk18
+  DEPENDS:= asterisk18 @BROKEN
 endef
 
 define Package/asterisk18-cdr/description
@@ -222,6 +221,18 @@ $(call Package/asterisk18/Default/description)
  support to Asterisk.
 endef
 
+define Package/asterisk18-chan-lantiq
+$(call Package/asterisk18/Default)
+  TITLE:=Lantiq TAPI support
+  DEPENDS:= asterisk18 @TARGET_lantiq +TARGET_lantiq:kmod-ltq-vmmc +TARGET_lantiq:kmod-ltq-tapi
+  URL:=http://git.nanl.de/?p=asterisk_channel_lantiq.git
+endef
+
+define Package/asterisk18-chan-lantiq/description
+$(call Package/asterisk18/Default/description)
+ This package provides the channel chan_lantiq support to Asterisk.
+endef
+
 ifneq ($(SDK)$(CONFIG_PACKAGE_asterisk18-app-meetme),)
   CONFIGURE_ARGS+= \
 	--with-dahdi="$(STAGING_DIR)/usr"
@@ -286,6 +297,7 @@ endif
 CONFIGURE_ARGS+= \
 	--without-curses \
 	--with-gsm=internal \
+	--without-cap \
 	--without-gtk \
 	--without-gtk2 \
 	--without-isdnnet \
@@ -315,6 +327,13 @@ CONFIGURE_ARGS+= \
 
 EXTRA_CFLAGS+= $(TARGET_CPPFLAGS)
 EXTRA_LDFLAGS+= $(TARGET_LDFLAGS)
+
+define Build/Prepare
+	$(call Build/Prepare/Default)
+ifneq ($(CONFIG_TARGET_lantiq),)
+	$(CP) ./src-lantiq/* $(PKG_BUILD_DIR)/
+endif
+endef
 
 define Build/Configure
 	$(call Build/Configure/Default,,$(SITE_VARS))
@@ -558,6 +577,17 @@ define Package/asterisk18-mysql/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/res_config_mysql.so $(1)/usr/lib/asterisk/modules/
 endef
 
+define Package/asterisk18-chan-lantiq/conffiles
+/etc/asterisk/lantiq.conf
+endef
+
+define Package/asterisk18-chan-lantiq/install
+	$(INSTALL_DIR) $(1)/usr/lib/asterisk/modules
+	$(INSTALL_DIR) $(1)/etc/asterisk
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/etc/asterisk/lantiq.conf $(1)/etc/asterisk/
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/chan_lantiq.so $(1)/usr/lib/asterisk/modules/
+endef
+
 define Package/asterisk18-res-srtp/install
 	$(INSTALL_DIR) $(1)/usr/lib/asterisk/modules
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/lib/asterisk/modules/res_srtp.so $(1)/usr/lib/asterisk/modules/
@@ -601,6 +631,7 @@ $(eval $(call BuildPackage,asterisk18-chan-mgcp))
 $(eval $(call BuildPackage,asterisk18-chan-skinny))
 $(eval $(call BuildPackage,asterisk18-curl))
 $(eval $(call BuildPackage,asterisk18-mysql))
+$(eval $(call BuildPackage,asterisk18-chan-lantiq))
 $(eval $(call BuildPackage,asterisk18-res-srtp))
 $(eval $(call Buildasterisk18ModuleTemplate,app_authenticate,Authenticate,support for executing arbitrary authenticate commands))
 $(eval $(call Buildasterisk18ModuleTemplate,app_chanisavail,Channel availability check,support for checking if a channel is available))

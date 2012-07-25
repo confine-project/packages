@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2007-2011 OpenWrt.org
+# Copyright (C) 2007-2012 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -16,7 +16,7 @@ endif
 
 PKG_NAME:=avahi
 PKG_VERSION:=0.6.30
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -94,7 +94,7 @@ endef
 define Package/avahi-daemon
   $(call Package/avahi/Default)
   SUBMENU:=IP Addresses and Names
-  DEPENDS:=+libavahi +libexpat
+  DEPENDS:=+libavahi +libexpat +librt +libdbus
   TITLE+= (daemon)
 endef
 
@@ -233,6 +233,7 @@ endif
 
 CONFIGURE_VARS+= \
 	CFLAGS="$$$$CFLAGS -DNDEBUG -DDISABLE_SYSTEMD" \
+	ac_cv_header_sys_capability_h=no \
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include

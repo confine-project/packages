@@ -43,6 +43,7 @@ endef
 
 define Package/krb5-client
 	$(call Package/krb5/Default)
+	DEPENDS:=+krb5-libs
 	TITLE:=Kerberos 5 Client
 endef
 
@@ -82,6 +83,7 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib \
 		$(1)/usr
+	rm -f $(1)/usr/lib/libcom_err*
 endef
 
 define Package/krb5-libs/install

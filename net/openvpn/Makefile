@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openvpn
-PKG_VERSION:=2.2.1
-PKG_RELEASE:=5
+PKG_VERSION:=2.2.2
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://swupdate.openvpn.net/community/releases @SF/openvpn
-PKG_MD5SUM:=500bee5449b29906150569aaf2eb2730
+PKG_MD5SUM:=c5181e27b7945fa6276d21873329c5c7
 
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
@@ -55,6 +55,7 @@ CONFIGURE_ARGS+= \
 	--with-ifconfig-path=/sbin/ifconfig \
 	--with-iproute-path=/usr/sbin/ip \
 	--with-route-path=/sbin/route \
+	--enable-password-save \
 	--disable-debug \
 	--disable-plugins \
 	--disable-pthread \
@@ -125,11 +126,6 @@ endif
 ifeq ($(CONFIG_OPENVPN_DISABLE_PORT_SHARE),y)
 CONFIGURE_ARGS += \
 	--disable-port-share
-endif
-
-ifeq ($(CONFIG_OPENVPN_ENABLE_PASSWORD_SAVE),y)
-CONFIGURE_ARGS += \
-	--enable-password-save
 endif
 
 ifeq ($(CONFIG_OPENVPN_DISABLE_DEF_AUTH),y)

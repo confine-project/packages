@@ -1,5 +1,5 @@
 # 
-# Copyright (C) 2009-2011 OpenWrt.org
+# Copyright (C) 2009-2012 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -8,15 +8,14 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=olsrd
-PKG_VERSION:=0.6.2
-PKG_RELEASE:=2
+PKG_VERSION:=0.6.3
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=http://www.olsr.org/releases/0.6
-PKG_MD5SUM:=1f55bbbaf0737364b53daaeecc2cd50c
 
+PKG_MD5SUM:=b28ed2e3dc6c529ab690f1c805ad32a2
 PKG_BUILD_PARALLEL:=1
-PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -77,10 +76,16 @@ define Package/olsrd-mod-httpinfo
   TITLE:=Small informative web server plugin
 endef
 
+define Package/olsrd-mod-jsoninfo
+  $(call Package/olsrd/template)
+  DEPENDS:=olsrd
+  TITLE:=Small informative plugin with JSON output
+endef
+
 define Package/olsrd-mod-mdns
   $(call Package/olsrd/template)
   DEPENDS:=olsrd
-  TITLE:=Multicast DNS plugin
+  TITLE:=MDNS/Zeroconf/Bonjour packet distribution 
 endef
 
 define Package/olsrd-mod-nameservice
@@ -95,6 +100,13 @@ define Package/olsrd-mod-p2pd
   TITLE:=Peer to Peer Discovery plugin
 endef
 
+
+define Package/olsrd-mod-pgraph
+  $(call Package/olsrd/template)
+  DEPENDS:=olsrd
+  TITLE:=output network topology for pgraph
+endef
+
 define Package/olsrd-mod-quagga
   $(call Package/olsrd/template)
   DEPENDS:=olsrd
@@ -105,6 +117,12 @@ define Package/olsrd-mod-secure
   $(call Package/olsrd/template)
   DEPENDS:=olsrd
   TITLE:=Message signing plugin to secure routing domain
+endef
+
+define Package/olsrd-mod-tas
+  $(call Package/olsrd/template)
+  DEPENDS:=olsrd
+  TITLE:=tas - tiny appliation server programming example
 endef
 
 define Package/olsrd-mod-txtinfo
@@ -129,16 +147,11 @@ MAKE_FLAGS+= \
 	DESTDIR="$(PKG_INSTALL_DIR)" \
 	STRIP="true" \
 	INSTALL_LIB="true" \
-	SUBDIRS="arprefresh bmf dot_draw dyn_gw dyn_gw_plain httpinfo mdns nameservice p2pd quagga secure txtinfo watchdog"
+	SUBDIRS="arprefresh bmf dot_draw dyn_gw dyn_gw_plain httpinfo jsoninfo mdns nameservice p2pd pgraph quagga secure tas txtinfo watchdog"
 
 define Build/Compile
 	$(call Build/Compile/Default,all)
 	$(call Build/Compile/Default,libs)
-endef
-
-define Build/Install
-	$(call Build/Install/Default,install)
-	$(call Build/Install/Default,install_libs)
 endef
 
 define Package/olsrd/install
@@ -180,6 +193,11 @@ define Package/olsrd-mod-httpinfo/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/httpinfo/olsrd_httpinfo.so.* $(1)/usr/lib/
 endef
 
+define Package/olsrd-mod-jsoninfo/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/jsoninfo/olsrd_jsoninfo.so.* $(1)/usr/lib/
+endef
+
 define Package/olsrd-mod-mdns/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/mdns/olsrd_mdns.so.* $(1)/usr/lib/
@@ -195,6 +213,11 @@ define Package/olsrd-mod-p2pd/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/p2pd/olsrd_p2pd.so.* $(1)/usr/lib/
 endef
 
+define Package/olsrd-mod-pgraph/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/pgraph/olsrd_pgraph.so.* $(1)/usr/lib/
+endef
+
 define Package/olsrd-mod-quagga/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/quagga/olsrd_quagga.so.* $(1)/usr/lib/
@@ -205,6 +228,11 @@ define Package/olsrd-mod-secure/install
 	$(CP) ./files/olsrd_secure_key $(1)/etc/olsrd.d/
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/secure/olsrd_secure.so.* $(1)/usr/lib/
+endef
+
+define Package/olsrd-mod-tas/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/tas/olsrd_tas.so.* $(1)/usr/lib/
 endef
 
 define Package/olsrd-mod-txtinfo/install
@@ -224,10 +252,13 @@ $(eval $(call BuildPackage,olsrd-mod-bmf))
 $(eval $(call BuildPackage,olsrd-mod-dyn-gw))
 $(eval $(call BuildPackage,olsrd-mod-dyn-gw-plain))
 $(eval $(call BuildPackage,olsrd-mod-httpinfo))
+$(eval $(call BuildPackage,olsrd-mod-jsoninfo))
 $(eval $(call BuildPackage,olsrd-mod-mdns))
 $(eval $(call BuildPackage,olsrd-mod-nameservice))
 $(eval $(call BuildPackage,olsrd-mod-p2pd))
+$(eval $(call BuildPackage,olsrd-mod-pgraph))
 $(eval $(call BuildPackage,olsrd-mod-quagga))
 $(eval $(call BuildPackage,olsrd-mod-secure))
+$(eval $(call BuildPackage,olsrd-mod-tas))
 $(eval $(call BuildPackage,olsrd-mod-txtinfo))
 $(eval $(call BuildPackage,olsrd-mod-watchdog))
