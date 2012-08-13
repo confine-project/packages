@@ -22,6 +22,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/diffutils
   SECTION:=devel
   CATEGORY:=Development
+  DEPENDS+= +librt
   TITLE:=diffutils
   URL:=http://www.gnu.org/software/diffutils/
 endef
