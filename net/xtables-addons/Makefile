@@ -10,7 +10,7 @@ include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=xtables-addons
 PKG_VERSION:=1.42
-PKG_RELEASE:=1
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_MD5SUM:=7c996a0400667b57ab4fb53a013ae742
@@ -39,12 +39,11 @@ CONFIGURE_ARGS+= \
 	--with-xtlibdir="/usr/lib/iptables" \
 
 define Build/Compile
-	$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
+	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
 		ARCH="$(LINUX_KARCH)" \
 		CROSS_COMPILE="$(TARGET_CROSS)" \
 		DESTDIR="$(PKG_INSTALL_DIR)" \
 		DEPMOD="/bin/true" \
-		LDFLAGS="$(TARGET_LDFLAGS)" \
 		all
 endef
 
@@ -54,7 +53,6 @@ define Build/Install
 		CROSS_COMPILE="$(TARGET_CROSS)" \
 		DESTDIR="$(PKG_INSTALL_DIR)" \
 		DEPMOD="/bin/true" \
-		LDFLAGS="$(TARGET_LDFLAGS)" \
 		install
 endef
 
@@ -101,12 +99,33 @@ define BuildTemplate
 
 endef
 
+
+define Package/iptaccount
+  $(call Package/xtables-addons)
+  CATEGORY:=Network
+  TITLE:=iptables-mod-account control utility
+  DEPENDS:=iptables +iptables-mod-account
+endef
+
+define Package/iptaccount/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(CP) \
+		$(PKG_INSTALL_DIR)/usr/lib/libxt_ACCOUNT_cl.so* \
+		$(1)/usr/lib/
+	$(CP) \
+		$(PKG_INSTALL_DIR)/usr/sbin/iptaccount \
+		$(1)/usr/sbin/
+endef
+
+
 #$(eval $(call BuildTemplate,SUFFIX,DESCRIPTION,EXTENSION,MODULE,PRIORITY,DEPENDS))
 
 $(eval $(call BuildTemplate,compat-xtables,API compatibilty layer,,compat_xtables,45,,CONFIG_NF_CONNTRACK_MARK=y))
 $(eval $(call BuildTemplate,rawpost,RAWPOST,,iptable_rawpost $(if $(CONFIG_IPV6),ip6table_rawpost),50,+kmod-ipt-compat-xtables))
 $(eval $(call BuildTemplate,nathelper-rtsp,RTSP Conntrack and NAT,,rtsp/nf_conntrack_rtsp rtsp/nf_nat_rtsp,46,+kmod-ipt-conntrack-extra))
 
+$(eval $(call BuildTemplate,account,ACCOUNT,xt_ACCOUNT,ACCOUNT/xt_ACCOUNT,46,+kmod-ipt-compat-xtables))
 $(eval $(call BuildTemplate,chaos,CHAOS,xt_CHAOS,xt_CHAOS,47,+kmod-ipt-compat-xtables +kmod-ipt-delude +kmod-ipt-tarpit))
 $(eval $(call BuildTemplate,condition,Condition,xt_condition,xt_condition,46,))
 $(eval $(call BuildTemplate,delude,DELUDE,xt_DELUDE,xt_DELUDE,46,+kmod-ipt-compat-xtables))
@@ -128,3 +147,5 @@ $(eval $(call BuildTemplate,rawnat,RAWNAT,xt_RAWDNAT xt_RAWSNAT,xt_RAWNAT,46,+km
 $(eval $(call BuildTemplate,steal,STEAL,xt_STEAL,xt_STEAL,46,+kmod-ipt-compat-xtables))
 $(eval $(call BuildTemplate,sysrq,SYSRQ,xt_SYSRQ,xt_SYSRQ,46,+kmod-ipt-compat-xtables))
 $(eval $(call BuildTemplate,tarpit,TARPIT,xt_TARPIT,xt_TARPIT,46,+kmod-ipt-compat-xtables))
+
+$(eval $(call BuildPackage,iptaccount))

@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tcpdump
 PKG_VERSION:=4.2.1
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.tcpdump.org/release/ \
@@ -19,6 +19,7 @@ PKG_SOURCE_URL:=http://www.tcpdump.org/release/ \
 PKG_MD5SUM:=c202878c6db054767b52651041b9e60e
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(BUILD_VARIANT)/$(PKG_NAME)-$(PKG_VERSION)
+PKG_BUILD_PARALLEL:=1
 
 PKG_INSTALL:=1
 
@@ -44,8 +45,12 @@ define Package/tcpdump-mini
 endef
 
 CONFIGURE_ARGS += \
-	--without-crypto \
+	--without-crypto
+
+ifeq ($(CONFIG_IPV6),y)
+CONFIGURE_ARGS += \
 	--enable-ipv6
+endif
 
 CONFIGURE_VARS += \
 	BUILD_CC="$(TARGET_CC)" \

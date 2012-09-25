@@ -31,6 +31,28 @@ PKG_MD5SUM:=060d43c8194fa6a119cada966fc807a7
 
 include $(INCLUDE_DIR)/package.mk
 
+# The files in the .tar.gz are
+#    src/all/...
+#    src/build/...
+#    src/test/...
+# and so on
+#
+# What we want is
+#    $(PKG_BUILD_DIR)/all/...
+#    $(PKG_BUILD_DIR)/build/...
+#    $(PKG_BUILD_DIR)/test/...
+# and so on
+#
+# The following two lines make this happen
+#    1.  change tar option to strip out the top-level, src in
+#        this case
+#    2.  change the tar output to the build directory.  The
+#        original tar command was
+#        $(HOST_TAR) -C/.. $(1) $(TAR_OPTIONS)
+
+TAR_OPTIONS:=--strip-components 1 $(TAR_OPTIONS)
+TAR_CMD=$(HOST_TAR) -C $(1) $(TAR_OPTIONS)
+
 define Package/appweb
   SECTION:=net
   CATEGORY:=Network
@@ -46,21 +68,31 @@ define Package/appweb/description
 endef
 
 CONFIGURE_ARGS += \
-	-q --defaults=release --shared --tune=size --without-php \
-	--without-ssl --disable-angel --disable-samples --disable-access-log \
-	--disable-complete-native --disable-complete-cross --webdir=/www \
-	--logdir=/var/log --port=8000 --sslPort=8443 --config=flat
-
-define Build/Prepare
-	tar xzf "$(DL_DIR)/$(PKG_SOURCE)" --strip-components 1 -C "$(PKG_BUILD_DIR)"
-endef
+	-q \
+	--defaults=release \
+	--shared \
+	--tune=size \
+	--without-php \
+	--without-ssl \
+	--disable-angel \
+	--disable-samples \
+	--disable-access-log \
+	--disable-complete-native \
+	--disable-complete-cross \
+	--webdir=/www \
+	--logdir=/var/log \
+	--port=8000 \
+	--sslPort=8443 \
+	--config=flat
 
 define Build/Configure
 	$(call Build/Configure/Default)
 endef
 
 define Build/Compile
-	$(MAKE) -C $(PKG_BUILD_DIR) $(TARGET_CONFIGURE_OPTS)
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+		$(TARGET_CONFIGURE_OPTS) \
+		BLD_CC_DYN_LOAD=1
 endef
 
 define Package/appweb/install
