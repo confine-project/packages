@@ -21,8 +21,8 @@ PKG_INSTALL:=1
 include $(INCLUDE_DIR)/package.mk
 
 define Package/mrd6
-  SECTION:=ipv6
-  CATEGORY:=IPv6
+  SECTION:=net
+  CATEGORY:=Network
   TITLE:=IPv6 multicast routing daemon
   URL:=http://fivebits.net/proj/mrd6
   DEPENDS:=+kmod-ipv6 +libstdcpp
@@ -49,7 +49,7 @@ MRD6_MAKEFLAGS:= \
 	PREFIX="/usr"
 
 define Build/Compile
-	$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR)/src $(MRD6_MAKEFLAGS) all
+	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR)/src $(MRD6_MAKEFLAGS) all
 endef
 
 define Build/Install

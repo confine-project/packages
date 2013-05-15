@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2010-2011 OpenWrt.org
+# Copyright (C) 2010-2012 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wide-dhcpv6
 PKG_VERSION:=20080615
-PKG_RELEASE:=10
+PKG_RELEASE:=11
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=@SF/$(PKG_NAME)
@@ -18,8 +18,8 @@ PKG_MD5SUM:=1011e165850fe40d3e332dad2bfd30b3
 include $(INCLUDE_DIR)/package.mk
 
 define Package/wide-dhcpv6/Default
-  SECTION:=ipv6
-  CATEGORY:=IPv6
+  SECTION:=net
+  CATEGORY:=Network
   TITLE:=WIDE-DHCPv6
   SUBMENU:=wide-dhcpv6
   DEPENDS:=+kmod-ipv6 
