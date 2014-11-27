@@ -9,11 +9,13 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tar
 PKG_VERSION:=1.23
+PKG_VERSION:=1.28
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=@GNU/$(PKG_NAME)
 PKG_MD5SUM:=41e2ca4b924ec7860e51b43ad06cdb7e
+PKG_MD5SUM:=8f32b2bc1ed7ddf4cf4e4a39711341b0
 
 PKG_INSTALL:=1
 
@@ -22,7 +24,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/tar
   SECTION:=utils
   CATEGORY:=Utilities
-  DEPENDS:=+bzip2 +librt
+  DEPENDS:=+bzip2 +librt +libattr +attr
   TITLE:=GNU tar
   URL:=http://www.gnu.org/software/tar/
 endef
